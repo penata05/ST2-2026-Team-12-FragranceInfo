@@ -1,0 +1,43 @@
+@model Fragrance
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<div class="mb-3">
+    <label asp-for="Name" class="form-label"></label>
+    <input asp-for="Name" class="form-control" placeholder="Sauvage" />
+    <span asp-validation-for="Name" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Brand" class="form-label"></label>
+    <input asp-for="Brand" class="form-control" placeholder="Dior" />
+    <span asp-validation-for="Brand" class="text-danger"></span>
+</div>
+
+<div class="row">
+    <div class="col-sm-4 mb-3">
+        <label asp-for="ReleaseYear" class="form-label"></label>
+        <input asp-for="ReleaseYear" class="form-control" placeholder="2015" />
+        <span asp-validation-for="ReleaseYear" class="text-danger"></span>
+    </div>
+    <div class="col-sm-4 mb-3">
+        <label asp-for="Gender" class="form-label"></label>
+        <select asp-for="Gender" asp-items="new SelectList(Fragrance.Genders)" class="form-select">
+            <option value="">Choose</option>
+        </select>
+        <span asp-validation-for="Gender" class="text-danger"></span>
+    </div>
+    <div class="col-sm-4 mb-3">
+        <label asp-for="Concentration" class="form-label"></label>
+        <select asp-for="Concentration" asp-items="new SelectList(Fragrance.Concentrations)" class="form-select">
+            <option value="">Choose</option>
+        </select>
+        <span asp-validation-for="Concentration" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Notes" class="form-label"></label>
+    <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Bergamot, pepper, ambroxan"></textarea>
+    <span asp-validation-for="Notes" class="text-danger"></span>
+</div>

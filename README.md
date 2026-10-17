@@ -20,19 +20,21 @@ The application creates the `fragranceinfo` database and the `fragrances` table 
 
 The connection string is in `appsettings.json`. It uses the XAMPP defaults: user `root`, no password, port 3306.
 
-## Week 1
+## Features
 
 | Requirement | Where |
 | --- | --- |
 | Singleton design pattern | `Data/DatabaseConnection.cs` |
 | Insert | `FragranceRepository.InsertAsync`, form at `/Fragrances/Create` |
 | Select with filter | `FragranceRepository.GetFilteredAsync`, list at `/Fragrances` |
+| Update | `FragranceRepository.UpdateAsync`, form at `/Fragrances/Edit/{id}` |
+| Delete | `FragranceRepository.DeleteAsync`, confirmation at `/Fragrances/Delete/{id}` |
 
 ## Structure (MVC)
 
 | Part | Files |
 | --- | --- |
 | Model | `Models/Fragrance.cs`, `Models/FragranceFilter.cs`, `Models/FragranceListViewModel.cs` |
-| View | `Views/Fragrances/Index.cshtml`, `Views/Fragrances/Create.cshtml` |
+| View | `Views/Fragrances/Index.cshtml`, `Create.cshtml`, `Edit.cshtml`, `Delete.cshtml` |
 | Controller | `Controllers/FragrancesController.cs` |
 | Data access | `Data/DatabaseConnection.cs`, `Data/FragranceRepository.cs`, `Data/DatabaseInitializer.cs` |

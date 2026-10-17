@@ -44,4 +44,63 @@ public class FragrancesController : Controller
         TempData["Message"] = $"{fragrance.Name.Trim()} by {fragrance.Brand.Trim()} was added.";
         return RedirectToAction(nameof(Index));
     }
+
+    public async Task<IActionResult> Edit(int id)
+    {
+        var fragrance = await _repository.GetByIdAsync(id);
+        if (fragrance == null)
+        {
+            return NotFound();
+        }
+
+        return View(fragrance);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit([FromRoute] int id, Fragrance fragrance)
+    {
+        if (id != fragrance.Id)
+        {
+            return BadRequest();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return View(fragrance);
+        }
+
+        if (!await _repository.UpdateAsync(fragrance))
+        {
+            return NotFound();
+        }
+
+        TempData["Message"] = $"{fragrance.Name.Trim()} by {fragrance.Brand.Trim()} was updated.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    public async Task<IActionResult> Delete(int id)
+    {
+        var fragrance = await _repository.GetByIdAsync(id);
+        if (fragrance == null)
+        {
+            return NotFound();
+        }
+
+        return View(fragrance);
+    }
+
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed([FromRoute] int id)
+    {
+        var fragrance = await _repository.GetByIdAsync(id);
+        if (fragrance == null || !await _repository.DeleteAsync(id))
+        {
+            return NotFound();
+        }
+
+        TempData["Message"] = $"{fragrance.Name} by {fragrance.Brand} was deleted.";
+        return RedirectToAction(nameof(Index));
+    }
 }

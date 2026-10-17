@@ -66,6 +66,7 @@ else
                     <th>Gender</th>
                     <th>Concentration</th>
                     <th>Main notes</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -78,6 +79,10 @@ else
                         <td>@fragrance.Gender</td>
                         <td>@fragrance.Concentration</td>
                         <td class="text-muted">@fragrance.Notes</td>
+                        <td class="text-end text-nowrap">
+                            <a asp-action="Edit" asp-route-id="@fragrance.Id" class="btn btn-sm btn-outline-dark">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@fragrance.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </td>
                     </tr>
                 }
             </tbody>

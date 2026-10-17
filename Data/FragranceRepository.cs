@@ -17,16 +17,57 @@ public class FragranceRepository
         await using var connection = await _database.OpenConnectionAsync();
         await using var command = new MySqlCommand(sql, connection);
 
-        command.Parameters.AddWithValue("@name", fragrance.Name.Trim());
-        command.Parameters.AddWithValue("@brand", fragrance.Brand.Trim());
-        command.Parameters.AddWithValue("@releaseYear", (object?)fragrance.ReleaseYear ?? DBNull.Value);
-        command.Parameters.AddWithValue("@gender", fragrance.Gender);
-        command.Parameters.AddWithValue("@concentration", fragrance.Concentration);
-        command.Parameters.AddWithValue("@notes",
-            string.IsNullOrWhiteSpace(fragrance.Notes) ? DBNull.Value : fragrance.Notes.Trim());
+        AddFragranceParameters(command, fragrance);
 
         await command.ExecuteNonQueryAsync();
         return (int)command.LastInsertedId;
+    }
+
+    public async Task<Fragrance?> GetByIdAsync(int id)
+    {
+        const string sql = @"
+            SELECT id, name, brand, release_year, gender, concentration, notes
+            FROM fragrances
+            WHERE id = @id;";
+
+        await using var connection = await _database.OpenConnectionAsync();
+        await using var command = new MySqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@id", id);
+
+        await using var reader = await command.ExecuteReaderAsync();
+        return await reader.ReadAsync() ? ReadFragrance(reader) : null;
+    }
+
+    public async Task<bool> UpdateAsync(Fragrance fragrance)
+    {
+        const string sql = @"
+            UPDATE fragrances
+            SET name = @name,
+                brand = @brand,
+                release_year = @releaseYear,
+                gender = @gender,
+                concentration = @concentration,
+                notes = @notes
+            WHERE id = @id;";
+
+        await using var connection = await _database.OpenConnectionAsync();
+        await using var command = new MySqlCommand(sql, connection);
+
+        command.Parameters.AddWithValue("@id", fragrance.Id);
+        AddFragranceParameters(command, fragrance);
+
+        return await command.ExecuteNonQueryAsync() > 0;
+    }
+
+    public async Task<bool> DeleteAsync(int id)
+    {
+        const string sql = "DELETE FROM fragrances WHERE id = @id;";
+
+        await using var connection = await _database.OpenConnectionAsync();
+        await using var command = new MySqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@id", id);
+
+        return await command.ExecuteNonQueryAsync() > 0;
     }
 
     public async Task<List<Fragrance>> GetFilteredAsync(FragranceFilter filter)
@@ -64,20 +105,7 @@ public class FragranceRepository
         await using var reader = await command.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
-            fragrances.Add(new Fragrance
-            {
-                Id = reader.GetInt32("id"),
-                Name = reader.GetString("name"),
-                Brand = reader.GetString("brand"),
-                ReleaseYear = reader.IsDBNull(reader.GetOrdinal("release_year"))
-                    ? null
-                    : reader.GetInt32("release_year"),
-                Gender = reader.GetString("gender"),
-                Concentration = reader.GetString("concentration"),
-                Notes = reader.IsDBNull(reader.GetOrdinal("notes"))
-                    ? null
-                    : reader.GetString("notes"),
-            });
+            fragrances.Add(ReadFragrance(reader));
         }
 
         return fragrances;
@@ -99,6 +127,32 @@ public class FragranceRepository
 
         return brands;
     }
+
+    private static void AddFragranceParameters(MySqlCommand command, Fragrance fragrance)
+    {
+        command.Parameters.AddWithValue("@name", fragrance.Name.Trim());
+        command.Parameters.AddWithValue("@brand", fragrance.Brand.Trim());
+        command.Parameters.AddWithValue("@releaseYear", (object?)fragrance.ReleaseYear ?? DBNull.Value);
+        command.Parameters.AddWithValue("@gender", fragrance.Gender);
+        command.Parameters.AddWithValue("@concentration", fragrance.Concentration);
+        command.Parameters.AddWithValue("@notes",
+            string.IsNullOrWhiteSpace(fragrance.Notes) ? DBNull.Value : fragrance.Notes.Trim());
+    }
+
+    private static Fragrance ReadFragrance(MySqlDataReader reader) => new()
+    {
+        Id = reader.GetInt32("id"),
+        Name = reader.GetString("name"),
+        Brand = reader.GetString("brand"),
+        ReleaseYear = reader.IsDBNull(reader.GetOrdinal("release_year"))
+            ? null
+            : reader.GetInt32("release_year"),
+        Gender = reader.GetString("gender"),
+        Concentration = reader.GetString("concentration"),
+        Notes = reader.IsDBNull(reader.GetOrdinal("notes"))
+            ? null
+            : reader.GetString("notes"),
+    };
 
     private static string EscapeLike(string text) =>
         text.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_");
