@@ -45,3 +45,14 @@ body {
   letter-spacing: .04em;
   color: #6c757d;
 }
+
+.ai-answer {
+  padding: 1rem 1.25rem;
+  background-color: #f8f9fa;
+  border: 1px solid #e5e5e5;
+  border-radius: .5rem;
+}
+
+.ai-answer-text {
+  white-space: pre-line;
+}

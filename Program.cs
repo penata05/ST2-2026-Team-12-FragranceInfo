@@ -1,4 +1,6 @@
 using FragranceInfo.Data;
+using FragranceInfo.Services;
+using Microsoft.Extensions.Options;
 using MySqlConnector;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +13,18 @@ DatabaseConnection.Instance.Configure(connectionString);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<FragranceRepository>();
+
+builder.Services.AddOptions<GeminiOptions>()
+    .Bind(builder.Configuration.GetSection(GeminiOptions.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddHttpClient<IAiService, GeminiService>((services, client) =>
+{
+    var options = services.GetRequiredService<IOptions<GeminiOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
+    client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+});
 
 var app = builder.Build();
 
