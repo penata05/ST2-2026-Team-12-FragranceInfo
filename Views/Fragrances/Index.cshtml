@@ -1,91 +1,78 @@
 @model FragranceListViewModel
 @{
     ViewData["Title"] = "Fragrances";
+    var count = Model.Fragrances.Count;
+    var summary = Model.Filter.IsActive
+        ? $"{count} {(count == 1 ? "fragrance matches" : "fragrances match")} the filter"
+        : $"{count} {(count == 1 ? "fragrance" : "fragrances")} in the catalogue";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">Fragrances</h1>
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Fragrances</h1>
+        <p class="page-lead">@summary</p>
+    </div>
     <a asp-action="Create" class="btn btn-primary">Add fragrance</a>
 </div>
 
-<form asp-action="Index" method="get" class="filter-bar mb-4">
-    <div class="row g-2 align-items-end">
-        <div class="col-md-4">
-            <label for="Name" class="form-label">Name</label>
-            <input type="search" id="Name" name="Name" value="@Model.Filter.Name"
-                   class="form-control" placeholder="Part of the name" />
-        </div>
-        <div class="col-md-3">
-            <label for="Brand" class="form-label">Brand</label>
-            <select id="Brand" name="Brand" class="form-select">
-                <option value="">All brands</option>
-                @foreach (var brand in Model.Brands)
-                {
-                    <option value="@brand" selected="@(brand == Model.Filter.Brand)">@brand</option>
-                }
-            </select>
-        </div>
-        <div class="col-md-2">
-            <label for="Gender" class="form-label">Gender</label>
-            <select id="Gender" name="Gender" class="form-select">
-                <option value="">All</option>
-                @foreach (var gender in Fragrance.Genders)
-                {
-                    <option value="@gender" selected="@(gender == Model.Filter.Gender)">@gender</option>
-                }
-            </select>
-        </div>
-        <div class="col-md-auto">
-            <button type="submit" class="btn btn-dark">Filter</button>
-            @if (Model.Filter.IsActive)
+<form asp-action="Index" method="get" class="filter" role="search">
+    <div class="filter-name">
+        <label for="Name" class="form-label">Name</label>
+        <input type="search" id="Name" name="Name" value="@Model.Filter.Name"
+               class="form-control" placeholder="Part of the name" />
+    </div>
+    <div>
+        <label for="Brand" class="form-label">Brand</label>
+        <select id="Brand" name="Brand" class="form-select">
+            <option value="">All brands</option>
+            @foreach (var brand in Model.Brands)
             {
-                <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+                <option value="@brand" selected="@(brand == Model.Filter.Brand)">@brand</option>
             }
-        </div>
+        </select>
+    </div>
+    <div>
+        <label for="Gender" class="form-label">Gender</label>
+        <select id="Gender" name="Gender" class="form-select">
+            <option value="">All</option>
+            @foreach (var gender in Fragrance.Genders)
+            {
+                <option value="@gender" selected="@(gender == Model.Filter.Gender)">@gender</option>
+            }
+        </select>
+    </div>
+    <div class="filter-actions">
+        <button type="submit" class="btn btn-outline-primary">Filter</button>
+        @if (Model.Filter.IsActive)
+        {
+            <a asp-action="Index" class="btn btn-quiet">Clear filter</a>
+        }
     </div>
 </form>
 
-@if (Model.Fragrances.Count == 0)
+@if (count == 0)
 {
-    <p class="text-muted">
-        @(Model.Filter.IsActive ? "No fragrances match the filter." : "There are no fragrances yet.")
-    </p>
+    <div class="empty">
+        @if (Model.Filter.IsActive)
+        {
+            <p class="empty-title">No fragrances match this filter.</p>
+            <p class="page-lead">Try part of the name only, or a different brand or gender.</p>
+        }
+        else
+        {
+            <p class="empty-title">The catalogue is empty.</p>
+            <a asp-action="Create" class="btn btn-primary">Add the first fragrance</a>
+        }
+    </div>
 }
 else
 {
-    <p class="text-muted small mb-2">
-        @Model.Fragrances.Count @(Model.Fragrances.Count == 1 ? "fragrance" : "fragrances")
-    </p>
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Brand</th>
-                    <th>Year</th>
-                    <th>Gender</th>
-                    <th>Concentration</th>
-                    <th>Main notes</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var fragrance in Model.Fragrances)
-                {
-                    <tr>
-                        <td class="fw-semibold">@fragrance.Name</td>
-                        <td>@fragrance.Brand</td>
-                        <td>@fragrance.ReleaseYear</td>
-                        <td>@fragrance.Gender</td>
-                        <td>@fragrance.Concentration</td>
-                        <td class="text-muted">@fragrance.Notes</td>
-                        <td class="text-end text-nowrap">
-                            <a asp-action="Edit" asp-route-id="@fragrance.Id" class="btn btn-sm btn-outline-dark">Edit</a>
-                            <a asp-action="Delete" asp-route-id="@fragrance.Id" class="btn btn-sm btn-outline-danger">Delete</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+    <ul class="fragrance-list">
+        @foreach (var fragrance in Model.Fragrances)
+        {
+            <li>
+                <partial name="_FragranceRow" model="fragrance" />
+            </li>
+        }
+    </ul>
 }

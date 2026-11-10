@@ -1,0 +1,54 @@
+@model Fragrance
+@{
+    var notes = NotePalette.Split(Model.Notes);
+    var showActions = ViewData["ShowActions"] as bool? ?? true;
+    var gender = Model.Gender switch
+    {
+        "Male" => "For men",
+        "Female" => "For women",
+        _ => "Unisex",
+    };
+}
+
+<article class="fragrance">
+    <div class="blotter" aria-hidden="true">
+        @foreach (var note in notes)
+        {
+            <span class="note-@note.Family"></span>
+        }
+    </div>
+
+    <div class="fragrance-main">
+        <h2 class="fragrance-name">@Model.Name</h2>
+        <p class="fragrance-brand">@Model.Brand</p>
+    </div>
+
+    <div class="fragrance-notes">
+        @if (notes.Count == 0)
+        {
+            <span class="fragrance-empty">No notes added</span>
+        }
+        else
+        {
+            <ul class="notes" aria-label="Main notes">
+                @foreach (var note in notes)
+                {
+                    <li class="note note-@note.Family" title="@note.Family">@note.Name</li>
+                }
+            </ul>
+        }
+    </div>
+
+    <div class="fragrance-details">
+        <span>@Model.Concentration</span>
+        <span>@gender@(Model.ReleaseYear is int year ? $", {year}" : "")</span>
+    </div>
+
+    @if (showActions)
+    {
+        <div class="fragrance-actions">
+            <a asp-controller="Fragrances" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+            <a asp-controller="Fragrances" asp-action="Delete" asp-route-id="@Model.Id" class="danger">Delete</a>
+        </div>
+    }
+</article>

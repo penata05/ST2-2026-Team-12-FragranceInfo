@@ -7,48 +7,41 @@
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/FragranceInfo.styles.css" asp-append-version="true" />
 </head>
+@{
+    var controller = ViewContext.RouteData.Values["controller"] as string;
+    var action = ViewContext.RouteData.Values["action"] as string;
+    var onCatalogue = controller == "Fragrances" && action != "Create";
+    var onCreate = controller == "Fragrances" && action == "Create";
+    var onAdvisor = controller == "Advisor";
+}
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark box-shadow mb-4">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Fragrances" asp-action="Index">FragranceInfo</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Fragrances" asp-action="Index">Fragrances</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Fragrances" asp-action="Create">Add fragrance</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Advisor" asp-action="Index">AI advisor</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @if (TempData["Message"] is string message)
-            {
-                <div class="alert alert-success" role="alert">@message</div>
-            }
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - FragranceInfo - ST2, Team 12
+    <header class="site-header">
+        <div class="container site-header-inner">
+            <a class="wordmark" asp-controller="Fragrances" asp-action="Index">FragranceInfo</a>
+            <nav class="site-nav" aria-label="Main">
+                <a class="@(onCatalogue ? "active" : null)" aria-current="@(onCatalogue ? "page" : null)"
+                   asp-controller="Fragrances" asp-action="Index">Fragrances</a>
+                <a class="@(onCreate ? "active" : null)" aria-current="@(onCreate ? "page" : null)"
+                   asp-controller="Fragrances" asp-action="Create">Add fragrance</a>
+                <a class="@(onAdvisor ? "active" : null)" aria-current="@(onAdvisor ? "page" : null)"
+                   asp-controller="Advisor" asp-action="Index">AI advisor</a>
+            </nav>
         </div>
+    </header>
+
+    <main role="main" class="container site-main">
+        @if (TempData["Message"] is string message)
+        {
+            <div class="flash" role="status">@message</div>
+        }
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">FragranceInfo, ST2 2026, Team 12</div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

@@ -1,51 +1,76 @@
 @model AdvisorViewModel
 @{
     ViewData["Title"] = "AI advisor";
+    string[] suggestions =
+    [
+        "Fresh and light for summer days",
+        "Something warm and sweet for winter evenings",
+        "A unisex scent I can wear to the office",
+    ];
 }
 
-<h1 class="h3 mb-1">AI advisor</h1>
-<p class="text-muted mb-4">Describe what you like and get recommendations from the fragrances in the catalogue.</p>
-
-@if (!Model.IsConfigured)
-{
-    <div class="alert alert-warning">
-        The AI advisor is not set up yet. Add a Gemini API key as described in README.md, then restart the application.
+<div class="page-head">
+    <div>
+        <h1 class="page-title">AI advisor</h1>
+        <p class="page-lead">Describe what you like, and Gemini picks up to three fragrances from the catalogue.</p>
     </div>
-}
+</div>
 
-<div class="row">
-    <div class="col-lg-8">
-        <form asp-action="Index" method="post" id="advisor-form">
-            <div class="mb-3">
-                <label asp-for="Question" class="form-label"></label>
-                <textarea asp-for="Question" class="form-control" rows="3"
-                          placeholder="Something fresh for summer that I can wear to the office"></textarea>
-                <span asp-validation-for="Question" class="text-danger"></span>
-            </div>
-            <button type="submit" id="ask-button" class="btn btn-primary" disabled="@(!Model.IsConfigured)">Ask</button>
-        </form>
+<div class="advisor">
+    @if (!Model.IsConfigured)
+    {
+        <div class="notice notice-warning">
+            The AI advisor is not set up yet. Add a Gemini API key as described in README.md, then restart the application.
+        </div>
+    }
 
-        @if (Model.Error != null)
-        {
-            <div class="alert alert-danger mt-4">@Model.Error</div>
-        }
+    <form asp-action="Index" method="post" id="advisor-form" class="panel">
+        <label asp-for="Question" class="form-label"></label>
+        <textarea asp-for="Question" class="form-control" rows="3"
+                  placeholder="Something fresh for summer that I can wear to the office"></textarea>
+        <span asp-validation-for="Question" class="text-danger"></span>
 
-        @if (Model.Answer != null)
-        {
-            <div class="ai-answer mt-4">
-                <div class="small text-muted mb-2">Answer from Gemini</div>
-                <div class="ai-answer-text">@Model.Answer</div>
-            </div>
-        }
-    </div>
+        <div class="suggestions">
+            <span>Try:</span>
+            @foreach (var suggestion in suggestions)
+            {
+                <button type="button" class="suggestion">@suggestion</button>
+            }
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" id="ask-button" class="btn btn-primary" disabled="@(!Model.IsConfigured)">Ask Gemini</button>
+        </div>
+    </form>
+
+    @if (Model.Error != null)
+    {
+        <div class="notice notice-error" role="alert">@Model.Error</div>
+    }
+
+    @if (Model.Answer != null)
+    {
+        <section class="panel answer" aria-live="polite">
+            <h2 class="answer-title">Gemini suggests</h2>
+            <p class="answer-text">@Model.Answer</p>
+        </section>
+    }
 </div>
 
 @section Scripts {
     <script>
+        document.querySelectorAll('.suggestion').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var question = document.getElementById('Question');
+                question.value = button.textContent;
+                question.focus();
+            });
+        });
+
         document.getElementById('advisor-form').addEventListener('submit', function () {
             var button = document.getElementById('ask-button');
             button.disabled = true;
-            button.textContent = 'Thinking...';
+            button.textContent = 'Asking Gemini...';
         });
     </script>
 }

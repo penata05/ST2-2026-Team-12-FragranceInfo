@@ -38,6 +38,7 @@
 
 <div class="mb-3">
     <label asp-for="Notes" class="form-label"></label>
-    <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Bergamot, pepper, ambroxan"></textarea>
+    <textarea asp-for="Notes" class="form-control" rows="2" placeholder="Bergamot, pepper, ambroxan"></textarea>
+    <div class="form-text">Separate the notes with commas.</div>
     <span asp-validation-for="Notes" class="text-danger"></span>
 </div>

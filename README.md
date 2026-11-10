@@ -69,3 +69,4 @@ The model and the other settings are in the `Gemini` section of `appsettings.jso
 | Controller | `Controllers/FragrancesController.cs`, `Controllers/AdvisorController.cs` |
 | Data access | `Data/DatabaseConnection.cs`, `Data/FragranceRepository.cs`, `Data/DatabaseInitializer.cs` |
 | AI service | `Services/IAiService.cs`, `Services/GeminiService.cs`, `Services/GeminiOptions.cs` |
+| Design | `wwwroot/css/site.css`, `Helpers/NotePalette.cs` (colours for the notes), fonts in `wwwroot/fonts` |
